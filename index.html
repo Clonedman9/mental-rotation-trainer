@@ -520,7 +520,7 @@ var S={running:false,phase:'idle',tok:0,shapeA:null,shapeB:null,R:IDENT,
   mirror:false,angle:0,t0:0,score:DB.score||0,combo:0,best:DB.best||0,
   maxAngle:95,n:DB.settings.n,adapt:DB.settings.adapt,
   target:DB.settings.target,done:0,gOk:0,gTrials:[],groupStart:0,
-  dim:DB.settings.dim,theta:0};
+  dim:DB.settings.dim,theta:0,needTrial:false};
 
 var $=function(id){return document.getElementById(id);};
 
@@ -602,7 +602,7 @@ function answer(saidSame){
   var id=S.tok;
   setTimeout(function(){
     if(id!==S.tok)return;
-    if($('sheet').classList.contains('open')){refresh();}
+    if($('sheet').classList.contains('open')){refresh();pauseTrial();return;}
     if(S.target>0&&S.done>=S.target){endGroup();return;}
     newTrial();
   },720);
@@ -669,6 +669,21 @@ function drawRef(){
   ctx.textAlign='right';ctx.fillText('快',W-2,base+2);
 }
 
+function pauseTrial(){
+  if(!S.running)return;
+  S.tok++;                 /* 作废进行中的试次，避免计时被面板停留时间污染 */
+  S.phase='idle';
+  S.needTrial=true;
+}
+function resumeTrial(){
+  if(!S.running||!S.needTrial)return;
+  S.needTrial=false;
+  newTrial();
+}
+function closeSheet(){
+  $('sheet').classList.remove('open');
+  resumeTrial();
+}
 function showDemo(){
   if(S.dim===2){
     S.shapeA=genPoly2(S.n);
@@ -980,10 +995,11 @@ document.addEventListener('keydown',function(e){
   else if(k==='j'||k==='l'||e.key==='ArrowRight'){e.preventDefault();answer(false);}
 });
 $('btnData').addEventListener('click',function(){
+  pauseTrial();
   $('sheet').classList.add('open');refresh();
 });
-$('btnClose').addEventListener('click',function(){$('sheet').classList.remove('open');});
-$('sheet').addEventListener('click',function(e){if(e.target===$('sheet'))$('sheet').classList.remove('open');});
+$('btnClose').addEventListener('click',closeSheet);
+$('sheet').addEventListener('click',function(e){if(e.target===$('sheet'))closeSheet();});
 
 var tabs=document.querySelectorAll('.tab');
 function actTab(name){
@@ -1003,17 +1019,17 @@ for(var ti=0;ti<tabs.length;ti++)(function(btn){
 
 $('selTarget').addEventListener('change',function(){
   var v=+this.value;S.target=v;DB.settings.target=v;save();
-  if(S.running){startGroup();newTrial();}else updateProg();
+  if(S.running){startGroup();pauseTrial();}else updateProg();
 });
 $('selDim').addEventListener('change',function(){
   var v=+this.value;
   S.dim=v;DB.settings.dim=v;save();
   $('lblN').textContent=(v===2?'格数':'方块数');
-  if(S.running){startGroup();newTrial();}else{showDemo();}
+  if(S.running){startGroup();pauseTrial();}else{showDemo();}
 });
 $('selN').addEventListener('change',function(){
   S.n=+this.value;DB.settings.n=+this.value;save();
-  if(S.running){startGroup();newTrial();}else{showDemo();}
+  if(S.running){startGroup();pauseTrial();}else{showDemo();}
 });
 $('chkAdapt').addEventListener('change',function(){
   S.adapt=this.checked;DB.settings.adapt=this.checked;save();

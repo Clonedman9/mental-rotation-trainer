@@ -61,6 +61,7 @@
 | `versions/05-game-percentile.html` | 加入平均值与水平对照百分位 |
 | `versions/06-game-pieces10.html` | 方块数扩展到 10 |
 | `versions/07-game-2d.html` | 加入 2D 平面模式 |
+| `versions/08-game-timerfix.html` | 修复打开数据面板/改设置后首题计时被污染 |
 
 ## 指标口径
 
