@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#06080d">
+<title>心理旋转 · 测量与训练</title>
+<style>
+:root{--bg:#06080d;--sf:#0c1119;--sf2:#111823;--ln:#1b2331;--tx:#e7ecf6;--mu:#6f7c93;--ac:#4d8dff;--gd:#35c48a;--wn:#e0a340;--bd:#e05c5c}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{background:var(--bg);color:var(--tx);font-family:ui-sans-serif,-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  font-size:14px;line-height:1.55;overscroll-behavior:none;user-select:none;-webkit-user-select:none}
+#root{max-width:680px;margin:0 auto;padding:18px 16px 92px;min-height:100dvh}
+.hd{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:20px}
+.eyebrow{font-size:11px;letter-spacing:.14em;color:var(--mu);text-transform:uppercase;margin-bottom:6px}
+h1{font-size:22px;font-weight:600;letter-spacing:.01em}
+h2{font-size:13px;font-weight:600;color:var(--mu);letter-spacing:.04em;margin:26px 0 10px}
+.card{background:var(--sf);border:1px solid var(--ln);border-radius:14px;padding:16px;margin-bottom:10px}
+.card.lead{background:linear-gradient(180deg,#0e1626,#0b1019);border-color:#22314a}
+.t{font-size:12px;color:var(--mu);letter-spacing:.02em}
+.v{font-size:30px;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:-.01em;line-height:1.15}
+.v small{font-size:13px;font-weight:400;color:var(--mu);margin-left:4px;letter-spacing:0}
+.v .ci{font-size:12px;color:var(--mu);font-weight:400;display:block;margin-top:3px;letter-spacing:0}
+.btn{display:block;width:100%;height:50px;border-radius:12px;border:1px solid var(--ln);background:var(--sf2);color:var(--tx);
+  font-size:15px;font-weight:600;font-family:inherit;cursor:pointer;transition:transform .06s,background .15s,border-color .15s}
+.btn:active{transform:scale(.99)}
+.btn.pri{background:linear-gradient(135deg,#3f7ef0,#5a6cf0);border:0;color:#fff}
+.btn.ghost{background:transparent;color:var(--mu);height:42px;font-size:13px;font-weight:500}
+.btn.danger{background:transparent;color:var(--bd);border-color:#3a2027}
+.btn:disabled{opacity:.45;cursor:default}
+.btn+.btn{margin-top:8px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.metric{background:var(--sf2);border:1px solid var(--ln);border-radius:12px;padding:12px 13px}
+.metric .t{margin-bottom:5px}
+.metric .n{font-size:19px;font-weight:600;font-variant-numeric:tabular-nums}
+.metric .n small{font-size:11px;color:var(--mu);font-weight:400;margin-left:3px}
+.note{font-size:12px;color:var(--mu);line-height:1.65}
+.hint{font-size:11.5px;color:var(--mu);margin-top:10px;line-height:1.6}
+.warn{display:flex;gap:9px;font-size:12.5px;line-height:1.6;padding:11px 12px;border-radius:10px;background:#151208;border:1px solid #33280f;color:#d8b45e;margin-bottom:8px}
+.warn.ok{background:#0a1512;border-color:#173a2d;color:#5fd0a0}
+.tag{display:inline-block;font-size:10.5px;padding:2px 7px;border-radius:6px;background:#16233a;color:#8fb6f5;letter-spacing:.03em}
+.ring{width:56px;height:56px;flex:0 0 auto}
+details{border-top:1px solid var(--ln);margin-top:14px;padding-top:12px}
+details:first-of-type{border-top:0;margin-top:0;padding-top:0}
+summary{cursor:pointer;font-size:12.5px;color:var(--mu);list-style:none;display:flex;justify-content:space-between;align-items:center}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"＋";color:#43506b;font-size:14px}
+details[open] summary::after{content:"－"}
+.nav{position:fixed;left:0;right:0;bottom:0;background:rgba(6,8,13,.92);border-top:1px solid var(--ln);
+  backdrop-filter:blur(12px);display:flex;padding-bottom:env(safe-area-inset-bottom);z-index:20}
+.nav button{flex:1;height:56px;border:0;background:none;color:#4d5b74;font-size:11px;font-family:inherit;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
+.nav button.on{color:var(--tx)}
+.nav .dot{width:4px;height:4px;border-radius:2px;background:transparent}
+.nav button.on .dot{background:var(--ac)}
+table{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}
+th{font-size:10.5px;color:var(--mu);font-weight:500;text-align:right;padding:6px 4px;border-bottom:1px solid var(--ln)}
+th:first-child,td:first-child{text-align:left}
+td{padding:7px 4px;text-align:right;border-bottom:1px solid rgba(255,255,255,.035);font-variant-numeric:tabular-nums;color:#c3cddd}
+canvas{display:block;width:100%}
+/* session */
+#sess{position:fixed;inset:0;background:var(--bg);z-index:60;display:none;flex-direction:column;
+  padding:calc(10px + env(safe-area-inset-top)) 12px calc(12px + env(safe-area-inset-bottom))}
+#sess.on{display:flex}
+.sTop{display:flex;align-items:center;gap:12px;margin-bottom:8px;flex:0 0 auto}
+.sBar{flex:1;height:3px;background:#182131;border-radius:2px;overflow:hidden}
+.sBar i{display:block;height:100%;width:0;background:var(--ac);transition:width .25s}
+.sClock{font-size:11px;color:var(--mu);font-variant-numeric:tabular-nums;min-width:44px;text-align:right}
+.sStage{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;gap:8px}
+@media (min-width:560px){.sStage{flex-direction:row}}
+.pnl{position:relative;flex:1 1 0;min-height:0;min-width:0;border:1px solid var(--ln);border-radius:14px;
+  background:radial-gradient(circle at 50% 42%,#121b2b,#080c14 78%);overflow:hidden}
+.pnl canvas{position:absolute;inset:0;width:100%;height:100%}
+.pnl.ok{border-color:#1f7a55}
+.pnl.bad{border-color:#7a2b2b}
+.sFeed{flex:0 0 auto;height:20px;text-align:center;font-size:12.5px;color:var(--mu);font-variant-numeric:tabular-nums}
+.sFeed.gd{color:var(--gd)}.sFeed.bd{color:var(--bd)}
+.sAct{flex:0 0 auto;display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+.sAct button{height:58px;border-radius:13px;border:1px solid var(--ln);background:var(--sf2);color:var(--tx);
+  font-size:16px;font-weight:600;font-family:inherit;cursor:pointer}
+.sAct button:active{transform:scale(.98)}
+#result{position:fixed;inset:0;background:rgba(6,8,13,.96);z-index:70;display:none;align-items:center;justify-content:center;padding:24px}
+#result.on{display:flex}
+.rcard{width:100%;max-width:420px;background:var(--sf);border:1px solid var(--ln);border-radius:18px;padding:24px}
+#onb{position:fixed;inset:0;background:var(--bg);z-index:80;display:none;overflow:auto;padding:28px 20px}
+#onb.on{display:block}
+.ob{max-width:520px;margin:0 auto}
+.ob h1{font-size:21px;margin-bottom:14px}
+.ob p{font-size:13px;color:#a7b3c7;line-height:1.75;margin-bottom:12px}
+.ob li{font-size:13px;color:#a7b3c7;line-height:1.75;margin:0 0 10px 18px}
+.ob .k{color:var(--tx);font-weight:600}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<nav class="nav" id="nav"></nav>
+<div id="sess">
+  <div class="sTop"><div class="sBar"><i id="sBarFill"></i></div><div class="sClock" id="sClock"></div></div>
+  <div class="sStage">
+    <div class="pnl" id="pnlA"><canvas id="cvA"></canvas></div>
+    <div class="pnl" id="pnlB"><canvas id="cvB"></canvas></div>
+  </div>
+  <div class="sFeed" id="sFeed"></div>
+  <div class="sAct"><button id="bSame">相同</button><button id="bMirror">镜像</button></div>
+</div>
+<div id="result"><div class="rcard" id="rBody"></div></div>
+<div id="onb"><div class="ob" id="obBody"></div></div>
+<script>
+(function(){
+'use strict';
+
+/* ==================== 存储 ==================== */
+var KEY='mrt.v2';
+function loadDB(){
+  try{
+    var raw=localStorage.getItem(KEY);
+    if(raw){var o=JSON.parse(raw);if(o&&o.v===2)return o;}
+  }catch(e){}
+  return {v:2,sessions:[],settings:{nCubes:5,trainMin:5},onboarded:false};
+}
+var DB=loadDB();
+function saveDB(){try{localStorage.setItem(KEY,JSON.stringify(DB));}catch(e){}}
+
+/* ==================== 时间 ==================== */
+function isoWeek(d){
+  var t=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));
+  var day=t.getUTCDay()||7;
+  t.setUTCDate(t.getUTCDate()+4-day);
+  var y0=new Date(Date.UTC(t.getUTCFullYear(),0,1));
+  var w=Math.ceil((((t-y0)/86400000)+1)/7);
+  return t.getUTCFullYear()+'-W'+(w<10?'0':'')+w;
+}
+function weekOf(s){return s.week||isoWeek(new Date(s.ts));}
+function weekNo(w){return parseInt(w.split('-W')[1],10);}
+
+/* ==================== 数学 ==================== */
+function norm(v){var l=Math.sqrt(v[0]*v[0]+v[1]*v[1]+v[2]*v[2]);if(l<1e-6)return[0,1,0];return[v[0]/l,v[1]/l,v[2]/l];}
+function applyM(M,p){return[M[0][0]*p[0]+M[0][1]*p[1]+M[0][2]*p[2],M[1][0]*p[0]+M[1][1]*p[1]+M[1][2]*p[2],M[2][0]*p[0]+M[2][1]*p[1]+M[2][2]*p[2]];}
+function mm(A,B){var C=[[0,0,0],[0,0,0],[0,0,0]];for(var i=0;i<3;i++)for(var j=0;j<3;j++){var s=0;for(var k=0;k<3;k++)s+=A[i][k]*B[k][j];C[i][j]=s;}return C;}
+function rotMat(axis,ang){
+  var a=norm(axis),x=a[0],y=a[1],z=a[2],c=Math.cos(ang),s=Math.sin(ang),t=1-c;
+  return [[t*x*x+c,t*x*y-s*z,t*x*z+s*y],[t*x*y+s*z,t*y*y+c,t*y*z-s*x],[t*x*z-s*y,t*y*z+s*x,t*z*z+c]];
+}
+var IDENT=[[1,0,0],[0,1,0],[0,0,1]];
+
+var ROTS=(function(){
+  var perms=[[0,1,2],[0,2,1],[1,0,2],[1,2,0],[2,0,1],[2,1,0]];
+  var signs=[[1,1,1],[1,1,-1],[1,-1,1],[1,-1,-1],[-1,1,1],[-1,1,-1],[-1,-1,1],[-1,-1,-1]];
+  var out=[];
+  for(var a=0;a<perms.length;a++)for(var b=0;b<signs.length;b++){
+    var pm=perms[a],sg=signs[b],M=[[0,0,0],[0,0,0],[0,0,0]];
+    for(var i=0;i<3;i++)M[i][pm[i]]=sg[i];
+    var det=M[0][0]*(M[1][1]*M[2][2]-M[1][2]*M[2][1])-M[0][1]*(M[1][0]*M[2][2]-M[1][2]*M[2][0])+M[0][2]*(M[1][0]*M[2][1]-M[1][1]*M[2][0]);
+    if(det>0.5)out.push(M);
+  }
+  return out;
+})();
+function isIdent(M){return M[0][0]===1&&M[1][1]===1&&M[2][2]===1;}
+function canon(c){var a=[];for(var i=0;i<c.length;i++)a.push(c[i][0]+','+c[i][1]+','+c[i][2]);a.sort();return a.join('|');}
+var DIRS=[[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]];
+
+/* ==================== 图形 ==================== */
+function genShape(n){
+  var last=null;
+  for(var att=0;att<600;att++){
+    var cells=[[0,0,0]],set={'0,0,0':1},guard=0;
+    while(cells.length<n&&guard++<400){
+      var base=cells[(Math.random()*cells.length)|0],d=DIRS[(Math.random()*6)|0];
+      var nx=base[0]+d[0],ny=base[1]+d[1],nz=base[2]+d[2],k=nx+','+ny+','+nz;
+      if(!set[k]){set[k]=1;cells.push([nx,ny,nz]);}
+    }
+    if(cells.length<n)continue;
+    var ax=0,ay=0,az=0;
+    for(var i=0;i<cells.length;i++){ax+=cells[i][0];ay+=cells[i][1];az+=cells[i][2];}
+    var cx=Math.round(ax/n),cy=Math.round(ay/n),cz=Math.round(az/n),shape=[];
+    for(var j=0;j<cells.length;j++)shape.push([cells[j][0]-cx,cells[j][1]-cy,cells[j][2]-cz]);
+    last=shape;
+    var mn=[9,9,9],mx=[-9,-9,-9];
+    for(var q=0;q<shape.length;q++)for(var a2=0;a2<3;a2++){if(shape[q][a2]<mn[a2])mn[a2]=shape[q][a2];if(shape[q][a2]>mx[a2])mx[a2]=shape[q][a2];}
+    if(Math.max(mx[0]-mn[0],mx[1]-mn[1],mx[2]-mn[2])>4)continue;
+    var target=canon(shape),bad=false;
+    for(var r=0;r<ROTS.length;r++){if(isIdent(ROTS[r]))continue;if(canon(shape.map(function(p){return applyM(ROTS[r],p);}))===target){bad=true;break;}}
+    if(bad)continue;
+    var sX=true,sY=true,sZ=true;
+    for(var m=1;m<shape.length;m++){if(shape[m][0]!==shape[0][0])sX=false;if(shape[m][1]!==shape[0][1])sY=false;if(shape[m][2]!==shape[0][2])sZ=false;}
+    if(sX||sY||sZ)continue;
+    var mir=shape.map(function(p){return[-p[0],p[1],p[2]];});
+    for(var r2=0;r2<ROTS.length;r2++){if(canon(mir.map(function(p){return applyM(ROTS[r2],p);}))===target){bad=true;break;}}
+    if(bad)continue;
+    return shape;
+  }
+  return last||[[0,0,0],[1,0,0],[0,1,0],[0,0,1],[1,1,1]];
+}
+var FACES=[
+  {n:[1,0,0],v:[[.5,-.5,-.5],[.5,.5,-.5],[.5,.5,.5],[.5,-.5,.5]]},
+  {n:[-1,0,0],v:[[-.5,-.5,.5],[-.5,.5,.5],[-.5,.5,-.5],[-.5,-.5,-.5]]},
+  {n:[0,1,0],v:[[-.5,.5,-.5],[-.5,.5,.5],[.5,.5,.5],[.5,.5,-.5]]},
+  {n:[0,-1,0],v:[[-.5,-.5,.5],[-.5,-.5,-.5],[.5,-.5,-.5],[.5,-.5,.5]]},
+  {n:[0,0,1],v:[[-.5,-.5,.5],[.5,-.5,.5],[.5,.5,.5],[-.5,.5,.5]]},
+  {n:[0,0,-1],v:[[-.5,.5,-.5],[.5,.5,-.5],[.5,-.5,-.5],[-.5,-.5,-.5]]}
+];
+var CAM=4.5,LIGHT=[-0.42,0.66,0.62];
+
+function drawShape(ctx,W,H,cells,R){
+  ctx.clearRect(0,0,W,H);
+  if(!cells||!cells.length)return;
+  var occ={},i;
+  for(i=0;i<cells.length;i++)occ[cells[i][0]+','+cells[i][1]+','+cells[i][2]]=1;
+  var rad=0;
+  for(i=0;i<cells.length;i++){var rr=Math.sqrt(cells[i][0]*cells[i][0]+cells[i][1]*cells[i][1]+cells[i][2]*cells[i][2])+0.87;if(rr>rad)rad=rr;}
+  if(rad<0.001)rad=1;
+  var sc=1/rad,unit=Math.min(W,H)*0.34,ox=W/2,oy=H/2,faces=[];
+  for(var ci=0;ci<cells.length;ci++){
+    var cell=cells[ci],px=cell[0]*sc,py=cell[1]*sc,pz=cell[2]*sc;
+    for(var fi=0;fi<FACES.length;fi++){
+      var f=FACES[fi],nk=(cell[0]+f.n[0])+','+(cell[1]+f.n[1])+','+(cell[2]+f.n[2]);
+      if(occ[nk])continue;
+      var rn=applyM(R,f.n);
+      if(rn[2]<=0.0005)continue;
+      var pts=[],zs=0;
+      for(var vi=0;vi<4;vi++){
+        var v=f.v[vi],q=applyM(R,[px+v[0]*sc,py+v[1]*sc,pz+v[2]*sc]);
+        var depth=CAM-q[2];if(depth<0.2)depth=0.2;
+        var s=CAM/depth;
+        pts.push([ox+q[0]*s*unit,oy-q[1]*s*unit]);zs+=q[2];
+      }
+      var lum=rn[0]*LIGHT[0]+rn[1]*LIGHT[1]+rn[2]*LIGHT[2];if(lum<0)lum=0;
+      faces.push({pts:pts,z:zs/4,shade:0.34+0.66*lum});
+    }
+  }
+  faces.sort(function(a,b){return a.z-b.z;});
+  for(var k=0;k<faces.length;k++){
+    var fc=faces[k],l=Math.round(18+56*fc.shade);
+    ctx.beginPath();ctx.moveTo(fc.pts[0][0],fc.pts[0][1]);
+    for(var m=1;m<4;m++)ctx.lineTo(fc.pts[m][0],fc.pts[m][1]);
+    ctx.closePath();ctx.fillStyle='hsl(219, 68%, '+l+'%)';ctx.fill();
+    ctx.lineWidth=1;ctx.lineJoin='round';ctx.strokeStyle='rgba(6,9,16,0.55)';ctx.stroke();
+  }
+}
+function sizeCanvas(cv){
+  var r=cv.getBoundingClientRect();
+  if(!r.width||!r.height)return null;
+  var dpr=Math.min(window.devicePixelRatio||1,2.5);
+  cv.width=Math.round(r.width*dpr);cv.height=Math.round(r.height*dpr);
+  var ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);
+  return {ctx:ctx,w:r.width,h:r.height};
+}
+
+/* ==================== 统计 ==================== */
+var T95=[12.71,4.30,3.18,2.78,2.57,2.45,2.36,2.31,2.26,2.23,2.20,2.18,2.16,2.14,2.13,2.12,2.11,2.10,2.09,2.09,2.08,2.07,2.07,2.06,2.06,2.06,2.05,2.05,2.04,2.04];
+function tCrit(df){if(df<1)return 12.71;if(df<=30)return T95[df-1];return 1.96;}
+
+function linfit(pts){
+  var n=pts.length;if(n<4)return null;
+  var sx=0,sy=0,i;
+  for(i=0;i<n;i++){sx+=pts[i].x;sy+=pts[i].y;}
+  var mx=sx/n,my=sy/n,sxx=0,sxy=0,syy=0;
+  for(i=0;i<n;i++){var dx=pts[i].x-mx,dy=pts[i].y-my;sxx+=dx*dx;sxy+=dx*dy;syy+=dy*dy;}
+  if(sxx<1e-9)return null;
+  var b=sxy/sxx,a=my-b*mx,rss=0;
+  for(i=0;i<n;i++){var e=pts[i].y-(a+b*pts[i].x);rss+=e*e;}
+  var s2=rss/Math.max(1,n-2);
+  var se=Math.sqrt(s2/sxx);
+  var sea=Math.sqrt(s2*(1/n+mx*mx/sxx));
+  return {b:b,a:a,se:se,sea:sea,r2:syy>1e-9?1-rss/syy:0,n:n,mx:mx};
+}
+function speedCI(fit){
+  if(!fit||fit.b<=0)return null;
+  var t=tCrit(fit.n-2),lo=fit.b-t*fit.se,hi=fit.b+t*fit.se;
+  return {speed:1000/fit.b,
+          lo:hi>0?1000/hi:0,
+          hi:lo>0?1000/lo:Infinity,
+          seSlope:fit.se};
+}
+function meanRT(a){if(!a.length)return null;var s=0;for(var i=0;i<a.length;i++)s+=a[i];return s/a.length;}
+function pct(a,b){return b?Math.round(a/b*100):0;}
+
+/* 每周聚合：校准题按周合并，参数不同则隔离 */
+function weeklyStats(){
+  var byWeek={},i;
+  for(i=0;i<DB.sessions.length;i++){
+    var s=DB.sessions[i];
+    if(s.type!=='calib')continue;
+    var w=weekOf(s);
+    (byWeek[w]=byWeek[w]||[]).push(s);
+  }
+  var out=[];
+  var keys=Object.keys(byWeek).sort();
+  for(var ki=0;ki<keys.length;ki++){
+    var w2=keys[ki],list=byWeek[w2],cnt={},bestN=null,bestC=0;
+    for(i=0;i<list.length;i++){var nc=list[i].nCubes;cnt[nc]=(cnt[nc]||0)+1;}
+    for(var k in cnt)if(cnt[k]>bestC){bestC=cnt[k];bestN=+k;}
+    var used=[],skipped=0;
+    for(i=0;i<list.length;i++){if(list[i].nCubes===bestN)used.push(list[i]);else skipped++;}
+    var all=[],valid=[];
+    for(i=0;i<used.length;i++){
+      var tr=used[i].trials;
+      for(var j=0;j<tr.length;j++){
+        var t=tr[j];all.push(t);
+        if(t.ok&&t.rt>=250&&t.rt<=10000)valid.push({x:t.a,y:t.rt});
+      }
+    }
+    var fit=linfit(valid),sp=speedCI(fit);
+    var okN=0;
+    for(i=0;i<all.length;i++)if(all[i].ok)okN++;
+    out.push({
+      week:w2,no:weekNo(w2),nCubes:bestN,fit:fit,speed:sp?sp.speed:null,
+      lo:sp?sp.lo:null,hi:sp?sp.hi:null,
+      acc:all.length?okN/all.length:0,n:valid.length,total:all.length,
+      intercept:fit?fit.a:null,r2:fit?fit.r2:0,skipped:skipped,
+      sessions:used.length,excluded:all.length-valid.length-((all.length-okN)||0)
+    });
+  }
+  return out;
+}
+
+/* ==================== 会话 ==================== */
+var SESS={on:false,mode:'calib',plan:[],idx:0,trials:[],t0:0,phase:'idle',token:0,
+  shapeA:null,shapeB:null,R:IDENT,mirror:false,angle:0,deadline:0,maxAngle:95,
+  score:0,combo:0,lock:false,timer:null};
+
+var M0=mm(rotMat([1,0,0],0.42),rotMat([0,1,0],-0.6));
+
+function shuffle(a){for(var i=a.length-1;i>0;i--){var j=(Math.random()*(i+1))|0;var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+
+function buildCalibPlan(){
+  var strata=[[20,46],[47,73],[74,100],[101,127],[128,154],[155,180]];
+  var out=[],per=8;
+  for(var i=0;i<strata.length;i++)for(var j=0;j<per;j++)out.push(strata[i][0]+Math.random()*(strata[i][1]-strata[i][0]));
+  return shuffle(out);
+}
+
+function startSession(mode,minutes){
+  SESS.on=true;SESS.mode=mode;SESS.idx=0;SESS.trials=[];SESS.score=0;SESS.combo=0;
+  SESS.maxAngle=95;
+  if(mode==='calib'){SESS.plan=buildCalibPlan();SESS.deadline=0;}
+  else{SESS.plan=null;SESS.deadline=Date.now()+minutes*60000;}
+  if(SESS.timer)clearInterval(SESS.timer);
+  SESS.timer=setInterval(function(){
+    if(!SESS.on)return;
+    if(SESS.mode==='train')updateBar();
+  },500);
+  document.getElementById('sess').classList.add('on');
+  nextTrial();
+}
+
+function nextTrial(){
+  var id=++SESS.token||(SESS.token=1);
+  var shape=genShape(DB.settings.nCubes);
+  SESS.shapeA=shape;
+  SESS.mirror=Math.random()<0.5;
+  SESS.shapeB=SESS.mirror?shape.map(function(p){return[-p[0],p[1],p[2]];}):shape;
+
+  var angle;
+  if(SESS.mode==='calib'){angle=SESS.plan[SESS.idx];}
+  else{var minA=20,span=Math.max(12,SESS.maxAngle-minA);angle=minA+Math.random()*span;}
+
+  SESS.angle=angle;
+  SESS.R=rotMat(norm([Math.random()*2-1,Math.random()*2-1,Math.random()*2-1]),angle*Math.PI/180);
+
+  drawSession();
+  updateBar();
+  document.getElementById('sFeed').textContent='';
+  document.getElementById('sFeed').className='sFeed';
+  document.getElementById('pnlA').className='pnl';
+  document.getElementById('pnlB').className='pnl';
+
+  var tok=id;
+  requestAnimationFrame(function(){requestAnimationFrame(function(){
+    if(tok!==SESS.token)return;
+    SESS.t0=performance.now();SESS.phase='show';
+  });});
+}
+
+function drawSession(){
+  var a=sizeCanvas(document.getElementById('cvA'));
+  if(a)drawShape(a.ctx,a.w,a.h,SESS.shapeA,M0);
+  var b=sizeCanvas(document.getElementById('cvB'));
+  if(b)drawShape(b.ctx,b.w,b.h,SESS.shapeB,mm(M0,SESS.R));
+}
+
+function updateBar(){
+  var el=document.getElementById('sBarFill'),ck=document.getElementById('sClock');
+  if(SESS.mode==='calib'){
+    el.style.width=((SESS.idx)/SESS.plan.length*100)+'%';
+    ck.textContent=SESS.idx+' / '+SESS.plan.length;
+  }else{
+    var left=Math.max(0,SESS.deadline-Date.now());
+    var mm2=Math.floor(left/60000),ss=Math.floor(left%60000/1000);
+    ck.textContent=mm2+':'+(ss<10?'0':'')+ss;
+    el.style.width=(left/(DB.settings.trainMin*60000)*100)+'%';
+  }
+}
+
+function answer(saidSame){
+  if(!SESS.on||SESS.phase!=='show')return;
+  var rt=performance.now()-SESS.t0;
+  SESS.phase='feedback';
+  var correct=(saidSame===!SESS.mirror);
+
+  SESS.trials.push({a:SESS.angle,rt:rt,ok:correct,m:SESS.mirror});
+
+  var fa=document.getElementById('pnlA'),fb=document.getElementById('pnlB'),fd=document.getElementById('sFeed');
+
+  if(SESS.mode==='train'){
+    if(correct){SESS.combo++;SESS.score+=100+Math.max(0,Math.min(50,Math.round((2500-rt)/50)));}
+    else SESS.combo=0;
+    fa.className='pnl '+(correct?'ok':'bad');
+    fb.className='pnl '+(correct?'ok':'bad');
+    fd.textContent=correct?'✓ '+Math.round(rt)+' ms':'✗ 正确答案：'+(SESS.mirror?'镜像':'相同');
+    fd.className='sFeed '+(correct?'gd':'bd');
+    if(navigator.vibrate){try{navigator.vibrate(correct?8:[8,26,8]);}catch(e){}}
+  }
+
+  SESS.idx++;
+
+  var wait=SESS.mode==='train'?700:280;
+  setTimeout(function(){
+    if(!SESS.on)return;
+    if(SESS.mode==='calib'){
+      if(SESS.idx>=SESS.plan.length){endSession();return;}
+    }else{
+      if(Date.now()>=SESS.deadline){endSession();return;}
+      var w=SESS.trials.slice(-10);
+      if(w.length===10){
+        var c=0;for(var i=0;i<w.length;i++)if(w[i].ok)c++;
+        if(c>=8)SESS.maxAngle=Math.min(180,SESS.maxAngle+15);
+        else if(c<=4)SESS.maxAngle=Math.max(60,SESS.maxAngle-15);
+      }
+    }
+    nextTrial();
+  },wait);
+}
+
+function endSession(){
+  SESS.on=false;
+  SESS.phase='idle';
+  if(SESS.timer){clearInterval(SESS.timer);SESS.timer=null;}
+  document.getElementById('sess').classList.remove('on');
+
+  var ts=Date.now(),w=isoWeek(new Date(ts));
+  var rec={id:ts+'-'+Math.random().toString(36).slice(2,7),type:SESS.mode,ts:ts,week:w,
+           nCubes:DB.settings.nCubes,trials:SESS.trials};
+  DB.sessions.push(rec);saveDB();
+
+  showResult(rec);
+}
+
+function showResult(rec){
+  var tr=rec.trials,ok=0,valid=[];
+  for(var i=0;i<tr.length;i++){
+    if(tr[i].ok)ok++;
+    if(tr[i].ok&&tr[i].rt>=250&&tr[i].rt<=10000)valid.push({x:tr[i].a,y:tr[i].rt});
+  }
+  var html='';
+  if(rec.type==='calib'){
+    var fit=linfit(valid),sp=speedCI(fit);
+    html+='<div class="t" style="margin-bottom:14px">本周校准完成</div>';
+    if(sp){
+      html+='<div class="v">'+Math.round(sp.speed)+'<small>°/s</small>'
+        +'<span class="ci">95% 区间 '+(sp.hi===Infinity?'≥'+Math.round(sp.lo):Math.round(sp.lo)+'–'+Math.round(sp.hi))+' °/s</span></div>';
+      html+='<div class="note" style="margin-top:12px">旋转速度 = 反应时随角度差增长斜率的倒数。区间越窄，结论越可信。</div>';
+    }else{
+      html+='<div class="v">—</div><div class="note" style="margin-top:10px">有效试次不足，本次无法给出速度估计。</div>';
+    }
+    html+='<div class="grid2" style="margin-top:18px">'
+      +'<div class="metric"><div class="t">正确率</div><div class="n">'+pct(ok,tr.length)+'%</div></div>'
+      +'<div class="metric"><div class="t">有效试次</div><div class="n">'+valid.length+'<small>/ '+tr.length+'</small></div></div>'
+      +'</div>';
+  }else{
+    html+='<div class="t" style="margin-bottom:14px">训练结束</div>';
+    html+='<div class="grid2">'
+      +'<div class="metric"><div class="t">正确率</div><div class="n">'+pct(ok,tr.length)+'%</div></div>'
+      +'<div class="metric"><div class="t">题量</div><div class="n">'+tr.length+'</div></div>'
+      +'</div>';
+    html+='<div class="note" style="margin-top:16px">训练模式不报告旋转速度——自适应题目使角度分布不均匀，斜率无法与校准结果比较。</div>';
+  }
+  html+='<button class="btn pri" style="margin-top:20px" id="rDone">完成</button>';
+  document.getElementById('rBody').innerHTML=html;
+  document.getElementById('result').classList.add('on');
+  document.getElementById('rDone').addEventListener('click',function(){
+    document.getElementById('result').classList.remove('on');
+    render();
+  });
+}
+
+/* ==================== 视图 ==================== */
+var root=document.getElementById('root');
+var VIEW='home';
+
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+
+function navHTML(){
+  var items=[['home','今日'],['prog','进展'],['me','我的']];
+  var h='';
+  for(var i=0;i<items.length;i++){
+    h+='<button data-v="'+items[i][0]+'" class="'+(VIEW===items[i][0]?'on':'')+'">'
+      +'<span>'+items[i][1]+'</span><span class="dot"></span></button>';
+  }
+  return h;
+}
+
+function ringSVG(done,total){
+  var r=24,c=2*Math.PI*r,p=Math.min(1,done/total);
+  return '<svg class="ring" viewBox="0 0 56 56">'
+    +'<circle cx="28" cy="28" r="'+r+'" fill="none" stroke="#1b2331" stroke-width="4"/>'
+    +'<circle cx="28" cy="28" r="'+r+'" fill="none" stroke="#4d8dff" stroke-width="4" stroke-linecap="round"'
+    +' stroke-dasharray="'+c.toFixed(1)+'" stroke-dashoffset="'+(c*(1-p)).toFixed(1)+'" transform="rotate(-90 28 28)" opacity="'+(p>0?1:.25)+'"/>'
+    +'<text x="28" y="32" text-anchor="middle" fill="#e7ecf6" font-size="13" font-family="ui-sans-serif,system-ui">'+done+'</text>'
+    +'</svg>';
+}
+
+function conclusion(weeks){
+  if(!weeks.length)return {text:'还没有校准数据。完成一次本周校准，才能建立基线。',state:'none'};
+  if(weeks.length===1)return {text:'已完成 1 周校准。至少需要 2 周数据，才能判断是否变快。',state:'one'};
+  var base=weeks[0],cur=weeks[weeks.length-1];
+  if(!base.fit||!cur.fit||!base.speed||!cur.speed)return {text:'数据不足以比较。',state:'none'};
+  var diff=base.fit.b-cur.fit.b;               // 正 = 变快
+  var se=Math.sqrt(base.fit.se*base.fit.se+cur.fit.se*cur.fit.se);
+  var z=Math.abs(diff)/se;
+  var chg=(cur.speed/base.speed-1)*100;
+  if(z<1.96){
+    return {text:'第 '+cur.no+' 周与基线的差异（'+(chg>=0?'+':'')+chg.toFixed(0)+'%）尚未超出测量误差，暂时看不出变快。',state:'ns',z:z,chg:chg,base:base,cur:cur,diff:diff};
+  }
+  if(diff>0){
+    return {text:'第 '+cur.no+' 周旋转速度 '+Math.round(cur.speed)+' °/s，较基线快 '+chg.toFixed(0)+'%，超出测量误差。',state:'up',z:z,chg:chg,base:base,cur:cur,diff:diff};
+  }
+  return {text:'第 '+cur.no+' 周旋转速度 '+Math.round(cur.speed)+' °/s，较基线慢 '+Math.abs(chg).toFixed(0)+'%，且超出测量误差。',state:'down',z:z,chg:chg,base:base,cur:cur,diff:diff};
+}
+
+function antiMisjudge(weeks,curWeek){
+  var out=[],base=weeks[0],cur=weeks[weeks.length-1];
+  if(weeks.length<2||!base.fit||!cur.fit)return out;
+  var diff=base.fit.b-cur.fit.b,se=Math.sqrt(base.fit.se*base.fit.se+cur.fit.se*cur.fit.se);
+  var z=Math.abs(diff)/se;
+
+  if(z<1.96){
+    out.push({k:'ns',t:'变化尚未超出测量误差。这不是“没练”，只是还看不出来。'});
+  }
+  var dA=cur.fit.a-base.fit.a,seA=Math.sqrt(base.fit.sea*base.fit.sea+cur.fit.sea*cur.fit.sea);
+  if(z<1.96&&Math.abs(dA)>1.96*seA&&dA<0){
+    out.push({k:'intercept',t:'反应更快了，但旋转本身没变快——这是熟练，不是提速。'});
+  }
+  var s=curWeek;
+  if(s&&s.repeatGain!=null&&s.repeatGain>0.12&&s.repeatN>=6){
+    out.push({k:'repeat',t:'重复题明显更快（'+(s.repeatGain*100).toFixed(0)+'%），进步可能部分来自记住题目。'});
+  }
+  if(s&&s.acc<0.65&&s.errFast){
+    out.push({k:'guess',t:'错误率高且错误反应明显更快，当前更像在猜，速度指标暂不可信。'});
+  }
+  return out;
+}
+
+function currentWeekStats(weeks){
+  var w=isoWeek(new Date());
+  for(var i=0;i<weeks.length;i++)if(weeks[i].week===w)return weeks[i];
+  return null;
+}
+
+/* ---------- 今日 ---------- */
+function viewHome(){
+  var weeks=weeklyStats();
+  var wk=isoWeek(new Date());
+  var calThis=DB.sessions.filter(function(s){return s.type==='calib'&&weekOf(s)===wk;});
+  var trainThis=DB.sessions.filter(function(s){return s.type==='train'&&weekOf(s)===wk;});
+  var cw=currentWeekStats(weeks);
+  var con=conclusion(weeks);
+  var h='';
+
+  h+='<div class="hd"><div><div class="eyebrow">第 '+weekNo(wk)+' 周</div><h1>今日</h1></div>'
+    +'<div style="text-align:right;font-size:11px;color:var(--mu)">本周训练<br><b style="font-size:16px;color:var(--tx);font-variant-numeric:tabular-nums">'+trainThis.length+'</b> / 3</div></div>';
+
+  if(!calThis.length){
+    h+='<div class="card lead">'
+      +'<div class="row"><div>'
+      +'<div class="t">本周校准 · 未完成</div>'
+      +'<div style="font-size:17px;font-weight:600;margin:6px 0 4px">先建立这一周的基线</div>'
+      +'<div class="note">48 题 · 约 6 分钟 · 参数固定<br>无反馈、无计分、无角度提示</div>'
+      +'</div>'+ringSVG(0,1)+'</div>'
+      +'<button class="btn pri" style="margin-top:16px" id="goCalib">开始校准</button>'
+      +'<div class="hint">校准的作用不是练习，是给“有没有变快”提供一个可比的刻度。中途退出不会保存。</div>'
+      +'</div>';
+  }else{
+    var sp=cw&&cw.speed?Math.round(cw.speed):null;
+    h+='<div class="card lead">'
+      +'<div class="row"><div style="flex:1;min-width:0">'
+      +'<div class="t">本周校准 · 已完成</div>'
+      +'<div class="v" style="margin-top:6px">'+(sp?sp:'—')+(sp?'<small>°/s</small>':'')+'</div>'
+      +(cw&&cw.lo!=null?'<div class="ci" style="font-size:11px;color:var(--mu);margin-top:2px">95% 区间 '+Math.round(cw.lo)+'–'+(cw.hi===Infinity?'∞':Math.round(cw.hi))+' °/s</div>':'')
+      +'</div>'+ringSVG(trainThis.length,3)+'</div>'
+      +'<div class="note" style="margin-top:12px">'+esc(con.text)+'</div>'
+      +'</div>';
+
+    h+='<button class="btn pri" id="goTrain" style="margin-top:10px">开始训练 · '+DB.settings.trainMin+' 分钟</button>';
+    h+='<button class="btn ghost" id="goCalib">再校准一次（提高精度）</button>';
+  }
+
+  h+='<h2>训练时长</h2><div class="grid2">';
+  var opts=[5,10,15];
+  for(var i=0;i<opts.length;i++){
+    h+='<button class="btn'+(DB.settings.trainMin===opts[i]?' pri':'')+'" data-min="'+opts[i]+'" style="height:44px;font-size:13px">'+opts[i]+' 分钟</button>';
+  }
+  h+='</div>';
+
+  if(weeks.length>1){
+    h+='<h2>最近一次变化</h2><div class="card"><div class="note">'+esc(con.text)+'</div>'
+      +'<button class="btn ghost" id="toProg" style="margin-top:10px">查看进展</button></div>';
+  }
+
+  root.innerHTML=h;
+  bind('goCalib',function(){startSession('calib');});
+  bind('goTrain',function(){startSession('train',DB.settings.trainMin);});
+  bind('toProg',function(){VIEW='prog';render();});
+  var bs=root.querySelectorAll('[data-min]');
+  for(var j=0;j<bs.length;j++)bs[j].addEventListener('click',function(){
+    DB.settings.trainMin=+this.getAttribute('data-min');saveDB();render();
+  });
+}
+
+/* ---------- 进展 ---------- */
+function viewProgress(){
+  var weeks=weeklyStats();
+  var h='';
+  h+='<div class="hd"><div><div class="eyebrow">跨周比较</div><h1>进展</h1></div></div>';
+
+  if(!weeks.length){
+    h+='<div class="card"><div class="note">还没有校准数据。完成本周校准后，这里会出现第一条趋势。</div>'
+      +'<button class="btn pri" style="margin-top:14px" id="g2">去做校准</button></div>';
+    root.innerHTML=h;bind('g2',function(){startSession('calib');});return;
+  }
+
+  var con=conclusion(weeks);
+  var badge=con.state==='up'?'<span class="tag" style="background:#0e2a20;color:#4ecb95">超出误差</span>'
+    :con.state==='down'?'<span class="tag" style="background:#2a1414;color:#e07777">下降</span>'
+    :con.state==='ns'?'<span class="tag" style="background:#241d0d;color:#d8b45e">误差范围内</span>':'<span class="tag">样本不足</span>';
+
+  h+='<div class="card lead">'+badge+'<div class="note" style="margin-top:10px;font-size:13.5px;color:#c9d3e4">'+esc(con.text)+'</div></div>';
+
+  h+='<div class="card"><div class="t" style="margin-bottom:8px">旋转速度趋势 · °/s</div><canvas id="trend" style="height:180px"></canvas>'
+    +'<div class="hint">竖线为 95% 置信区间。区间重叠时，差异不足以支撑结论。</div></div>';
+
+  var cur=weeks[weeks.length-1],base=weeks[0];
+  h+='<div class="grid2">'
+    +'<div class="metric"><div class="t">本周速度</div><div class="n">'+(cur.speed?Math.round(cur.speed):'—')+'<small>°/s</small></div></div>'
+    +'<div class="metric"><div class="t">相比基线</div><div class="n">'+(con.chg!=null?((con.chg>=0?'+':'')+con.chg.toFixed(0)+'%'):'—')+'</div></div>'
+    +'<div class="metric"><div class="t">正确率</div><div class="n">'+Math.round(cur.acc*100)+'%</div></div>'
+    +'<div class="metric"><div class="t">有效试次</div><div class="n">'+cur.n+'</div></div>'
+    +'</div>';
+
+  var warns=antiMisjudge(weeks,cur);
+  if(warns.length){
+    h+='<h2>需要留意</h2>';
+    for(var i=0;i<warns.length;i++)h+='<div class="warn">⚠<span>'+esc(warns[i].t)+'</span></div>';
+  }
+
+  h+='<h2>诊断</h2><div class="card">'
+    +'<details><summary>斜率与拟合</summary>'
+    +'<table><tbody>'
+    +'<tr><td>斜率</td><td>'+(cur.fit?cur.fit.b.toFixed(1)+' ms/°':'—')+'</td></tr>'
+    +'<tr><td>标准误</td><td>'+(cur.fit?'±'+cur.fit.se.toFixed(2):'—')+'</td></tr>'
+    +'<tr><td>截距（编码+决策）</td><td>'+(cur.intercept!=null?Math.round(cur.intercept)+' ms':'—')+'</td></tr>'
+    +'<tr><td>拟合优度 R²</td><td>'+(cur.r2?cur.r2.toFixed(2):'—')+'</td></tr>'
+    +'<tr><td>样本量</td><td>'+cur.n+' 试次</td></tr>'
+    +'</tbody></table>'
+    +'<div class="hint">R² 低说明反应时并不随角度稳定线性增长，此时斜率只是描述性数值。</div>'
+    +'</details>'
+    +'<details><summary>分角度正确率</summary>'+binTable(cur.week)+'</details>'
+    +'<details><summary>方法细节</summary>'+methodTable(cur)+'</details>'
+    +'</div>';
+
+  root.innerHTML=h;
+  drawTrend(document.getElementById('trend'),weeks);
+}
+
+function binTable(wk){
+  var bins=[[20,45],[45,90],[90,135],[135,180]];
+  var rows=[],i,j;
+  var trials=[];
+  for(i=0;i<DB.sessions.length;i++){
+    var s=DB.sessions[i];
+    if(s.type!=='calib'||weekOf(s)!==wk)continue;
+    for(j=0;j<s.trials.length;j++)trials.push(s.trials[j]);
+  }
+  var out='<table><thead><tr><th>角度</th><th>n</th><th>正确率</th><th>平均 RT</th></tr></thead><tbody>';
+  for(i=0;i<bins.length;i++){
+    var lo=bins[i][0],hi=bins[i][1],sel=[];
+    for(j=0;j<trials.length;j++)if(trials[j].a>=lo&&(i===bins.length-1?trials[j].a<=hi+1e-6:trials[j].a<hi))sel.push(trials[j]);
+    var ok=0,rts=[];
+    for(j=0;j<sel.length;j++){if(sel[j].ok){ok++;rts.push(sel[j].rt);}}
+    out+='<tr><td>'+lo+'–'+hi+'°</td><td>'+sel.length+'</td><td>'+(sel.length?Math.round(ok/sel.length*100):0)+'%</td>'
+      +'<td>'+(rts.length?Math.round(meanRT(rts))+' ms':'—')+'</td></tr>';
+  }
+  return out+'</tbody></table><div class="hint">各档样本量有限，单档差异不能直接解释为“旋转非匀速”。</div>';
+}
+
+function methodTable(cur){
+  return '<table><tbody>'
+    +'<tr><td>方块数（任务参数）</td><td>'+cur.nCubes+' 块</td></tr>'
+    +'<tr><td>本周校准次数</td><td>'+cur.sessions+'</td></tr>'
+    +'<tr><td>剔除试次（RT 越界）</td><td>'+(cur.total-cur.n)+'</td></tr>'
+    +'<tr><td>参数不一致被隔离</td><td>'+cur.skipped+' 次会话</td></tr>'
+    +'</tbody></table>'
+    +'<div class="hint">方块数变更视为新任务，跨参数的速度不合并统计。</div>';
+}
+
+function drawTrend(cv,weeks){
+  if(!cv)return;
+  var r=cv.getBoundingClientRect();
+  if(!r.width)return;
+  var dpr=Math.min(window.devicePixelRatio||1,2.5);
+  cv.width=Math.round(r.width*dpr);cv.height=Math.round(r.height*dpr);
+  var ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);
+  var W=r.width,H=r.height;
+  ctx.clearRect(0,0,W,H);
+  var padL=34,padR=12,padT=14,padB=24;
+  var x0=padL,y0=H-padB,pw=W-padL-padR,ph=H-padT-padB;
+
+  var pts=weeks.filter(function(w){return w.speed&&isFinite(w.speed);});
+  if(!pts.length){ctx.fillStyle='#6f7c93';ctx.font='11px ui-sans-serif';ctx.textAlign='center';ctx.fillText('暂无可绘制的速度估计',W/2,H/2);return;}
+
+  var lo=Infinity,hi=-Infinity;
+  for(var i=0;i<pts.length;i++){
+    lo=Math.min(lo,pts[i].lo!=null?pts[i].lo:pts[i].speed);
+    hi=Math.max(hi,pts[i].hi!=null&&isFinite(pts[i].hi)?pts[i].hi:pts[i].speed);
+  }
+  var pad=(hi-lo)*0.25||10;lo=Math.max(0,lo-pad);hi=hi+pad;
+
+  function X(i){return pts.length===1?x0+pw/2:x0+pw*(i/(pts.length-1));}
+  function Y(v){return y0-ph*(v-lo)/(hi-lo);}
+
+  ctx.strokeStyle='rgba(120,140,180,0.10)';ctx.lineWidth=1;
+  for(var g=0;g<=3;g++){
+    var v=lo+(hi-lo)*g/3,y=Y(v);
+    ctx.beginPath();ctx.moveTo(x0,y);ctx.lineTo(x0+pw,y);ctx.stroke();
+    ctx.fillStyle='#5a6579';ctx.font='9px ui-sans-serif';ctx.textAlign='right';ctx.textBaseline='middle';
+    ctx.fillText(Math.round(v),x0-5,y);
+  }
+
+  if(pts.length>1){
+    ctx.strokeStyle='rgba(77,141,255,.5)';ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(X(0),Y(pts[0].speed));
+    for(var j=1;j<pts.length;j++)ctx.lineTo(X(j),Y(pts[j].speed));
+    ctx.stroke();
+  }
+
+  ctx.setLineDash([3,4]);ctx.strokeStyle='rgba(120,135,160,.35)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(x0,Y(pts[0].speed));ctx.lineTo(x0+pw,Y(pts[0].speed));ctx.stroke();
+  ctx.setLineDash([]);
+
+  for(var k=0;k<pts.length;k++){
+    var p=pts[k],px=X(k),py=Y(p.speed);
+    if(p.lo!=null&&isFinite(p.hi)){
+      ctx.strokeStyle='rgba(77,141,255,.55)';ctx.lineWidth=1.2;
+      ctx.beginPath();ctx.moveTo(px,Y(p.lo));ctx.lineTo(px,Y(p.hi));ctx.stroke();
+      ctx.beginPath();ctx.moveTo(px-3,Y(p.lo));ctx.lineTo(px+3,Y(p.lo));
+      ctx.moveTo(px-3,Y(p.hi));ctx.lineTo(px+3,Y(p.hi));ctx.stroke();
+    }
+    ctx.beginPath();ctx.arc(px,py,3.4,0,Math.PI*2);ctx.fillStyle='#4d8dff';ctx.fill();
+    ctx.fillStyle='#5a6579';ctx.font='9.5px ui-sans-serif';ctx.textAlign='center';ctx.textBaseline='top';
+    ctx.fillText('W'+p.no,px,y0+6);
+  }
+}
+
+/* ---------- 我的 ---------- */
+function viewMe(){
+  var h='';
+  h+='<div class="hd"><div><div class="eyebrow">设置与方法</div><h1>我的</h1></div></div>';
+
+  h+='<div class="card"><div class="t">任务参数</div>'
+    +'<div class="row" style="margin-top:10px"><span style="font-size:13px">方块数</span>'
+    +'<select id="selN" style="background:#111823;color:#e7ecf6;border:1px solid #1b2331;border-radius:8px;padding:6px 10px;font-family:inherit;font-size:13px">'
+    +'<option value="4"'+(DB.settings.nCubes===4?' selected':'')+'>4 块</option>'
+    +'<option value="5"'+(DB.settings.nCubes===5?' selected':'')+'>5 块</option>'
+    +'<option value="6"'+(DB.settings.nCubes===6?' selected':'')+'>6 块</option>'
+    +'</select></div>'
+    +'<div class="hint">更改方块数等于更换任务，跨参数的速度不会合并比较。</div></div>';
+
+  h+='<div class="card"><div class="t">实验模式</div>'
+    +'<div class="note" style="margin-top:8px">锁定参数、按周排程、完整导出、平行题库。本版仅预留架构，未实现。</div>'
+    +'<button class="btn ghost" disabled style="margin-top:10px">即将开放</button></div>';
+
+  h+='<div class="card"><div class="t">数据</div>'
+    +'<div class="note" style="margin-top:8px">共 '+DB.sessions.length+' 次会话，保存在本机浏览器。清除即消失，建议定期导出。</div>'
+    +'<button class="btn" id="expJson" style="margin-top:12px;height:44px;font-size:13px">导出 JSON</button>'
+    +'<button class="btn" id="expCsv" style="height:44px;font-size:13px">导出 CSV（逐试次）</button>'
+    +'<button class="btn danger" id="wipe" style="height:44px;font-size:13px">清除全部数据</button></div>';
+
+  h+='<div class="card"><div class="t">这个方法测什么</div>'
+    +'<div class="note" style="margin-top:8px;line-height:1.8">'
+    +'测量的是“判断两个三维物体是否相同”这一特定任务的旋转速率，不等于空间能力，更不等于智力。<br><br>'
+    +'训练可以提高做题速度，但不承诺提高数学或科学成绩。<br><br>'
+    +'范式来源：Shepard & Metzler (1971)。个体差异极大，参考常模意义有限。</div></div>';
+
+  root.innerHTML=h;
+
+  document.getElementById('selN').addEventListener('change',function(){
+    DB.settings.nCubes=+this.value;saveDB();render();
+  });
+  document.getElementById('expJson').addEventListener('click',function(){exportJSON();});
+  document.getElementById('expCsv').addEventListener('click',function(){exportCSV();});
+  document.getElementById('wipe').addEventListener('click',function(){
+    if(confirm('将删除全部校准与训练记录，无法恢复。确定？')){
+      if(confirm('再确认一次：删除后历史趋势无法重建。')){
+        DB.sessions=[];saveDB();render();
+      }
+    }
+  });
+}
+
+/* ---------- 导出 ---------- */
+function download(name,text,type){
+  var blob=new Blob([text],{type:type||'text/plain;charset=utf-8'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url;a.download=name;document.body.appendChild(a);a.click();
+  setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(url);},100);
+}
+function exportJSON(){
+  download('mental-rotation-data.json',JSON.stringify(DB,null,2),'application/json');
+}
+function exportCSV(){
+  var rows=['session_id,mode,date,week,n_cubes,trial_index,angle,rt_ms,correct,mirror'];
+  for(var i=0;i<DB.sessions.length;i++){
+    var s=DB.sessions[i],d=new Date(s.ts).toISOString();
+    for(var j=0;j<s.trials.length;j++){
+      var t=s.trials[j];
+      rows.push([s.id,s.type,d,s.week||weekOf(s),s.nCubes,j+1,t.a.toFixed(1),Math.round(t.rt),t.ok?1:0,t.m?1:0].join(','));
+    }
+  }
+  download('mental-rotation-trials.csv',rows.join('\n'),'text/csv;charset=utf-8');
+}
+
+/* ---------- 路由 ---------- */
+function bind(id,fn){var el=document.getElementById(id);if(el)el.addEventListener('click',fn);}
+function render(){
+  if(VIEW==='home')viewHome();
+  else if(VIEW==='prog')viewProgress();
+  else viewMe();
+  document.getElementById('nav').innerHTML=navHTML();
+  var bs=document.querySelectorAll('#nav button');
+  for(var i=0;i<bs.length;i++)bs[i].addEventListener('click',function(){
+    VIEW=this.getAttribute('data-v');render();window.scrollTo(0,0);
+  });
+}
+
+/* ---------- 事件 ---------- */
+document.getElementById('bSame').addEventListener('click',function(){answer(true);});
+document.getElementById('bMirror').addEventListener('click',function(){answer(false);});
+document.addEventListener('keydown',function(e){
+  if(!SESS.on||e.repeat)return;
+  var k=(e.key||'').toLowerCase();
+  if(k==='f'||k==='a'||e.key==='ArrowLeft'){e.preventDefault();answer(true);}
+  else if(k==='j'||k==='l'||e.key==='ArrowRight'){e.preventDefault();answer(false);}
+});
+var rsz=null;
+window.addEventListener('resize',function(){
+  if(rsz)clearTimeout(rsz);
+  rsz=setTimeout(function(){
+    if(SESS.on)drawSession();
+    if(VIEW==='prog'){var c=document.getElementById('trend');if(c)drawTrend(c,weeklyStats());}
+  },120);
+});
+document.addEventListener('visibilitychange',function(){
+  if(document.hidden&&SESS.on&&SESS.phase==='show'){SESS.phase='paused';}
+  else if(!document.hidden&&SESS.on&&SESS.phase==='paused'){nextTrial();}
+});
+
+/* ---------- 首次引导 ---------- */
+function onboarding(){
+  document.getElementById('obBody').innerHTML=
+    '<h1>心理旋转：测量与训练</h1>'
+    +'<p>这个工具只做一件事——让你看见自己<b class="k">转得多快</b>，并且这个数字经得起跨周比较。</p>'
+    +'<p><b class="k">先说清楚边界：</b></p>'
+    +'<ul>'
+    +'<li>它测量的是“判断两个三维物体是否相同”这一特定任务的旋转速率，<b class="k">不等于空间能力，更不等于智力</b>。</li>'
+    +'<li>训练可以提高做题速度，<b class="k">不承诺</b>提高数学或科学成绩。</li>'
+    +'<li>个体差异极大，不要用别人的数字衡量自己。</li>'
+    +'<li>数据保存在本机浏览器，清除即消失，建议定期导出。</li>'
+    +'</ul>'
+    +'<p><b class="k">怎么用：</b>每周先做一次 6 分钟校准，再做训练。校准期间没有反馈和计分——这是为了让数字可信。</p>'
+    +'<button class="btn pri" style="margin-top:18px" id="obGo">我明白了</button>';
+  document.getElementById('onb').classList.add('on');
+  document.getElementById('obGo').addEventListener('click',function(){
+    DB.onboarded=true;saveDB();
+    document.getElementById('onb').classList.remove('on');
+    render();
+  });
+}
+
+/* ---------- 启动 ---------- */
+render();
+if(!DB.onboarded)onboarding();
+
+})();
+</script>
+</body>
+</html>
