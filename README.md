@@ -62,6 +62,7 @@
 | `versions/06-game-pieces10.html` | 方块数扩展到 10 |
 | `versions/07-game-2d.html` | 加入 2D 平面模式 |
 | `versions/08-game-timerfix.html` | 修复打开数据面板/改设置后首题计时被污染 |
+| `versions/09-complex-shapes.html` | 图形复杂化：弯曲臂 + 分叉，新增复杂度档位 |
 
 ## 指标口径
 
